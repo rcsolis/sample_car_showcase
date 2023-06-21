@@ -21,6 +21,7 @@ export interface ICustomFilterOptionsProps{
 export interface ICustomFilterProps {
     title: string;
     options: ICustomFilterOptionsProps[];
+    setFilter: React.Dispatch<React.SetStateAction<number>> | React.Dispatch<React.SetStateAction<string>>;
 }
 
 export interface ICar {
@@ -41,6 +42,10 @@ export interface ICardCardProps {
     car: ICar;
 }
 
+export interface ISearchBarProps{
+    setManufacturer: React.Dispatch<React.SetStateAction<string>>;
+    setModel: React.Dispatch<React.SetStateAction<string>>;
+}
 
 export interface ICarDetailsProps {
     car: ICar;
@@ -50,9 +55,9 @@ export interface ICarDetailsProps {
 
 export interface IFilterProps{
     manufacturer: string;
-    model: number;
+    model: string;
     fuel: string;
-    year: string;
+    year: number;
     limit: number;
 }
 
@@ -60,4 +65,5 @@ export interface IFilterProps{
 export interface ISearchMoreBtnProps {
     pageNumber:number;
     isNext:boolean;
+    setLimit: React.Dispatch<React.SetStateAction<number>>;
 }

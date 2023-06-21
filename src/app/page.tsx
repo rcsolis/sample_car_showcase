@@ -1,18 +1,40 @@
+'use client';
+import { useEffect, useState } from "react";
 import { Hero, SearchBar, CustomFilter, CarCard, ShowMoreBtn} from "@components";
 import { fuels, yearsOfProduction } from "@constants";
 import { fetchCars } from "@utils";
+import Image from "next/image";
 
+export default function Home() {
+  const [allCars, setAllCars] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [manufacturer, setManufacturer] = useState("");
+  const [model, setModel] = useState("");
+  const [fuel, setFuel] = useState("");
+  const [year, setYear] = useState(2022);
+  const [limit, setLimit] = useState(10);
 
-export default async function Home({ searchParams }) {
+  const getCars = async () => {
+    try{
+      setLoading(true);
+      const result = await fetchCars({
+        manufacturer: manufacturer || "",
+        model: model || "",
+        fuel: fuel || "",
+        year: year || 2022,
+        limit: limit || 10,
+      });
+      setAllCars(result);
+    }catch(error){
+      console.log(error);
+    }finally{
+      setLoading(false);
+    }
+  };
 
-  const allCars = await fetchCars({
-    manufacturer: searchParams.manufacturer || "",
-    model: searchParams.model || 2022,
-    fuel: searchParams.fuel || "",
-    year: searchParams.year || "",
-    limit: searchParams.limit || 10,
-  });
-  const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
+  useEffect(() => {
+    getCars();
+  }, [fuel, year, limit, manufacturer, model]);
   // Render
   return (
     <main className="overflow-hidden">
@@ -27,19 +49,35 @@ export default async function Home({ searchParams }) {
           </div>
 
           <div className="home__filters">
-            <SearchBar />
+            <SearchBar
+              setManufacturer={setManufacturer}
+              setModel={setModel}
+            />
             <div className="home__filter-container">
-              <CustomFilter title="fuel" options={fuels}/>
-              <CustomFilter title="year" options={yearsOfProduction}/>
+              <CustomFilter title="fuel" options={fuels} 
+              setFilter={setFuel} />
+              <CustomFilter title="year" options={yearsOfProduction}
+              setFilter={setYear}/>
             </div>
           </div>
 
-          {isDataEmpty?(
-            <div className="home__error-container">
-              <h2 className="text-black text-xl font-bold">Oops, no cars.</h2>
-              <p>{allCars?.message}</p>
-            </div>
-          ):(
+          { loading ? (
+              <div className="mt-16 w-full flex-center">
+                <Image src="/vercel.svg"
+                  width={50}
+                  height={50}
+                  alt="loading"
+                  className="object-contain"/>
+              </div> )
+              : !Array.isArray(allCars) || allCars.length < 1 || !allCars
+            ? (
+              <div className="home__cars-wrapper">
+                <p className="text-2xl font-bold">
+                  No cars found
+                </p>
+              </div>
+            )
+          :(
             <section>
               <div className="home__cars-wrapper">
                 {allCars?.map((car, i) => (
@@ -47,8 +85,10 @@ export default async function Home({ searchParams }) {
                 ))}
               </div>
               <ShowMoreBtn 
-                pageNumber={(searchParams.limit || 10) / 10}
-                isNext={(searchParams.limit || 10) > allCars.length}/>
+                pageNumber={(limit || 10) / 10}
+                isNext={(limit || 10) > allCars.length}
+                setLimit={setLimit}
+                />
             </section>
           )}
 

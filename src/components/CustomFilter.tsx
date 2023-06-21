@@ -6,29 +6,32 @@ import {useRouter} from "next/navigation";
 import { Listbox, Transition } from "@headlessui/react";
 
 const CustomFilter = (props:ICustomFilterProps) =>{
-    const {title, options} = props;
+    const {title, options, setFilter} = props;
     const [selected, setSelected] = useState(options[0]);
     const router = useRouter();
 
-    const handleUpdateParams = (e:{title:string, value:string})=>{
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.set(e.title, e.value.toLowerCase());
-        const newPathName = `${window.location.pathname}?${searchParams.toString()}`;
-        router.push(newPathName);
+    // const handleUpdateParams = (e:{title:string, value:string})=>{
+    //     const searchParams = new URLSearchParams(window.location.search);
+    //     searchParams.set(e.title, e.value.toLowerCase());
+    //     const newPathName = `${window.location.pathname}?${searchParams.toString()}`;
+    //     router.push(newPathName);
+    // }
+    const handleUpdateParams = (e:any) => {
+        setFilter(e);
     }
     //Render
     return (
         <div className="w-fit">
             <Listbox value={selected} onChange={(e)=>{
                 setSelected(e);
-                handleUpdateParams(e);
+                handleUpdateParams(e.value);
             }}>
                 <div className="relative z-10 w-fit">
                     <Listbox.Button className="custom-filter__btn">
                         <span className="block truncate">
                             {selected.title}
                         </span>
-                        <Image src="/chevron-up-dark.svg"
+                        <Image src="/chevron-up-down.svg"
                         alt="chevron-up" 
                         width={16} 
                         height={16}
